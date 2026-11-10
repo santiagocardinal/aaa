@@ -1042,6 +1042,446 @@ button { font: inherit; color: inherit; }
   .latiendo .corazon-latido { animation: latido 2.2s ease-in-out infinite !important; }
 }
 
+/* =====================================================================
+   VERSIÓN 2 — más ambiente, más interacción
+   ===================================================================== */
+
+/* ---------- Ambiente: nebulosa, luz y viñeta ---------- */
+.nebulosa {
+  position: absolute;
+  inset: -8%;
+  opacity: .55;
+  mix-blend-mode: screen;
+  background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='1400' height='1400'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.0032 .0045' numOctaves='5' seed='11'/%3E%3CfeColorMatrix values='0 0 0 0 .22  0 0 0 0 .38  0 0 0 0 .95  0 0 0 1.25 -.42'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E") center / cover no-repeat;
+  animation: nebulosa 70s ease-in-out infinite alternate;
+}
+@keyframes nebulosa { from { transform: scale(1) rotate(0deg); } to { transform: scale(1.12) rotate(4deg) translate(-2%, 1%); } }
+.luz-azul {
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(36vmax 36vmax at var(--mx, 50%) var(--my, 40%), rgba(158,195,255,.13), transparent 70%);
+  mix-blend-mode: screen;
+}
+.vineta { position: absolute; inset: 0; background: radial-gradient(ellipse at 50% 45%, transparent 50%, rgba(2,5,16,.7) 100%); }
+.destello-salto {
+  position: fixed;
+  inset: 0;
+  z-index: 3;
+  pointer-events: none;
+  opacity: 0;
+  background: radial-gradient(circle at 50% 50%, rgba(207,224,255,.35), rgba(91,140,255,.08) 35%, transparent 65%);
+}
+.destello-salto.activo { animation: destello-salto 1.3s ease-out; }
+@keyframes destello-salto { 0% { opacity: 0; } 45% { opacity: 1; } 100% { opacity: 0; } }
+
+/* Botones: reflejo y efecto imán */
+.btn { transition: transform .25s var(--suave), box-shadow .25s ease, filter .25s, translate .35s var(--suave); }
+.btn--siguiente, .btn--salir { backdrop-filter: blur(4px); }
+
+/* ---------- Bienvenida: constelación ---------- */
+.constelacion { width: clamp(120px, 34vw, 170px); margin-bottom: 4px; overflow: visible; }
+.constelacion-linea {
+  fill: none;
+  stroke: rgba(207,224,255,.55);
+  stroke-width: 1;
+  stroke-dasharray: 700;
+  stroke-dashoffset: 700;
+  animation: trazar 3.4s ease-in-out .8s forwards;
+  filter: drop-shadow(0 0 4px rgba(158,195,255,.8));
+}
+@keyframes trazar { to { stroke-dashoffset: 0; } }
+.constelacion-estrellas circle { fill: #fff; filter: drop-shadow(0 0 5px #9ec3ff); transform-box: fill-box; transform-origin: center; animation: estrella-titila 2.6s ease-in-out infinite; }
+.constelacion-estrellas circle:nth-child(3n) { animation-delay: -.8s; }
+.constelacion-estrellas circle:nth-child(3n+1) { animation-delay: -1.7s; }
+@keyframes estrella-titila { 0%, 100% { transform: scale(1); opacity: 1; } 50% { transform: scale(.55); opacity: .55; } }
+.inicio-titulo {
+  background: linear-gradient(100deg, #cfe0ff 0%, #ffffff 25%, #9ec3ff 45%, #ffffff 60%, #c9d3e6 80%, #ffffff 100%);
+  background-size: 250% 100%;
+  -webkit-background-clip: text;
+  background-clip: text;
+  animation: subir 1.1s var(--suave) forwards, brillo-azul 7s linear 2s infinite !important;
+}
+@keyframes brillo-azul { from { background-position: 0% 0; } to { background-position: 250% 0; } }
+.inicio-contenido > .constelacion { animation-delay: 0s; }
+
+/* ---------- Monito interactivo ---------- */
+.monito-escena { position: relative; display: flex; flex-direction: column; align-items: center; }
+.monito-btn { padding: 0; border: 0; background: none; cursor: pointer; -webkit-tap-highlight-color: transparent; touch-action: manipulation; }
+.monito-btn:focus-visible { outline: 2px solid var(--pastel); outline-offset: 6px; border-radius: 20px; }
+.monito-btn.salto svg { animation: salto-monito .7s var(--suave) !important; }
+@keyframes salto-monito {
+  0% { transform: translateY(0) scale(1, 1); }
+  20% { transform: translateY(4px) scale(1.06, .92); }
+  50% { transform: translateY(-34px) scale(.96, 1.05) rotate(-4deg); }
+  75% { transform: translateY(0) scale(1.04, .95); }
+  100% { transform: translateY(0) scale(1, 1); }
+}
+.terminado .ojo { transform-box: fill-box; transform-origin: center; animation: parpadear 4.2s ease-in-out infinite; }
+.terminado .ojo:last-of-type { animation-delay: .04s; }
+@keyframes parpadear { 0%, 90%, 100% { transform: scaleY(1); } 93% { transform: scaleY(.08); } 96% { transform: scaleY(1); } }
+.globo {
+  position: absolute;
+  top: 2%;
+  right: -4%;
+  z-index: 2;
+  margin: 0;
+  padding: 8px 16px 10px;
+  max-width: 13em;
+  border-radius: 18px 18px 18px 4px;
+  background: rgba(245,248,255,.95);
+  color: var(--tinta);
+  font-size: 1.35rem;
+  line-height: 1.1;
+  box-shadow: 0 12px 30px -10px rgba(0,0,0,.6), 0 0 24px rgba(158,195,255,.35);
+  opacity: 0;
+  transform: translateY(10px) scale(.7) rotate(-4deg);
+  transform-origin: 0% 100%;
+  pointer-events: none;
+}
+.globo.visible { animation: globo 2.4s var(--suave) forwards; }
+@keyframes globo {
+  0% { opacity: 0; transform: translateY(10px) scale(.7) rotate(-4deg); }
+  14% { opacity: 1; transform: translateY(0) scale(1.05) rotate(2deg); }
+  22% { transform: scale(1) rotate(0); }
+  80% { opacity: 1; transform: scale(1) rotate(0); }
+  100% { opacity: 0; transform: translateY(-8px) scale(.95); }
+}
+.pista-toque {
+  margin: 10px 0 0;
+  font-family: var(--f-mano);
+  font-size: 1.3rem;
+  color: var(--pastel);
+  opacity: 0;
+  transition: opacity .6s ease;
+  pointer-events: none;
+}
+.pista-toque.visible { opacity: .85; animation: respirar 2.2s ease-in-out infinite; }
+
+/* ---------- Carta: papel con textura ---------- */
+.carta {
+  background:
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='300' height='300'%3E%3Cfilter id='p'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.8' numOctaves='3' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 .3 0 0 0 0 .38 0 0 0 0 .6 0 0 0 .07 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23p)'/%3E%3C/svg%3E"),
+    repeating-linear-gradient(180deg, transparent 0 33px, rgba(47,95,208,.075) 33px 34px),
+    linear-gradient(170deg, #fdfdff 0%, #eef3ff 100%);
+}
+.carta-cuerpo p:first-child::first-letter {
+  float: left;
+  font-family: var(--f-mano);
+  font-size: 3.6em;
+  line-height: .8;
+  padding: 4px 8px 0 0;
+  color: var(--azul);
+}
+
+/* ---------- Historia: recuerdos que se dan vuelta ---------- */
+.pista-historia { font-size: 1.25rem; margin-top: 10px; }
+.pista-historia.usada { opacity: 0 !important; animation: none !important; }
+.mono-chico { font-family: var(--f-texto); font-size: .68rem; font-weight: 600; letter-spacing: .22em; text-transform: uppercase; color: var(--celeste); }
+.recuerdo-flip {
+  position: relative;
+  display: grid;
+  width: 100%;
+  padding: 0;
+  border: 0;
+  background: none;
+  text-align: left;
+  cursor: pointer;
+  perspective: 1200px;
+  transform: rotate(var(--giro));
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
+}
+.recuerdo-flip:focus-visible { outline: 2px solid var(--pastel); outline-offset: 6px; border-radius: 22px; }
+.cara {
+  grid-area: 1 / 1;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  min-height: 186px;
+  padding: 26px 20px 20px;
+  border-radius: 22px 22px 22px 6px;
+  border: 1px solid rgba(207,224,255,.24);
+  -webkit-backface-visibility: hidden;
+  backface-visibility: hidden;
+  transition: transform .9s cubic-bezier(.4,.2,.2,1);
+  box-shadow: 0 24px 50px -24px rgba(0,0,0,.75);
+}
+.cara--frente {
+  background:
+    radial-gradient(120% 90% at 0% 0%, rgba(158,195,255,.22), transparent 55%),
+    linear-gradient(160deg, rgba(47,95,208,.35), rgba(11,26,69,.55));
+  -webkit-backdrop-filter: blur(8px);
+  backdrop-filter: blur(8px);
+}
+.cara--dorso {
+  justify-content: center;
+  background:
+    radial-gradient(100% 80% at 100% 100%, rgba(207,224,255,.25), transparent 60%),
+    linear-gradient(160deg, #f5f8ff, #dfe9ff);
+  color: var(--tinta);
+  transform: rotateY(180deg);
+}
+.recuerdo--der .cara { border-radius: 22px 22px 6px 22px; }
+.girada .cara--frente { transform: rotateY(-180deg); }
+.girada .cara--dorso { transform: rotateY(0deg); }
+.recuerdo-num { position: absolute; top: 14px; left: 20px; opacity: .8; }
+.cara--frente .recuerdo-fecha { margin-top: 12px; font-size: 1.45rem; }
+.cara--frente .recuerdo-titulo { display: block; margin: 4px 0 12px; font-size: 1.6rem; }
+.recuerdo-girar { margin-top: auto; font-size: .78rem; letter-spacing: .06em; color: rgba(207,224,255,.75); }
+.recuerdo-img { width: 100%; aspect-ratio: 4/3; object-fit: cover; border-radius: 10px; margin-top: 18px; }
+.cara--dorso .recuerdo-fecha-chica { color: var(--azul); }
+.cara--dorso .recuerdo-texto { margin-top: 10px; font-family: var(--f-titulo); font-size: 1.22rem; line-height: 1.45; color: var(--tinta); }
+.cara--dorso .recuerdo-deco { color: var(--azul); opacity: .12; }
+.recuerdo.visible .recuerdo-nodo { animation: nodo-pulso 2.8s ease-in-out 1s infinite; }
+@keyframes nodo-pulso { 0%, 100% { box-shadow: 0 0 0 6px rgba(158,195,255,.12), 0 0 22px rgba(158,195,255,.55); } 50% { box-shadow: 0 0 0 12px rgba(158,195,255,.05), 0 0 30px rgba(158,195,255,.8); } }
+.recuerdo-simbolo { z-index: 2; }
+
+/* ---------- Diccionario: modo duelo ---------- */
+.modo {
+  position: relative;
+  display: inline-grid;
+  grid-template-columns: 1fr 1fr;
+  margin-top: 22px;
+  padding: 4px;
+  border-radius: 999px;
+  background: rgba(255,255,255,.07);
+  border: 1px solid rgba(207,224,255,.2);
+}
+.modo-btn {
+  position: relative;
+  z-index: 1;
+  min-height: 40px;
+  padding: 0 16px;
+  border: 0;
+  border-radius: 999px;
+  background: none;
+  font-size: .86rem;
+  font-weight: 600;
+  color: rgba(234,242,255,.7);
+  cursor: pointer;
+  white-space: nowrap;
+  transition: color .3s;
+  touch-action: manipulation;
+}
+.modo-btn.activo { color: #fff; }
+.modo-indicador {
+  position: absolute;
+  top: 4px;
+  bottom: 4px;
+  left: 4px;
+  width: calc(50% - 4px);
+  border-radius: 999px;
+  background: linear-gradient(135deg, var(--azul-vivo), var(--azul));
+  box-shadow: 0 6px 18px -6px rgba(91,140,255,.9);
+  transition: transform .5s var(--suave);
+}
+.duelo-activo .modo-indicador { transform: translateX(100%); }
+.sin-duelo .modo, .sin-duelo .duelo-leyenda { display: none; }
+.duelo-leyenda, .duelo-resumen { margin: 10px 0 0; text-align: center; max-height: 0; opacity: 0; overflow: hidden; transition: max-height .5s ease, opacity .5s ease; }
+.duelo-activo .duelo-leyenda { max-height: 30px; opacity: 1; }
+.duelo-activo .duelo-resumen { max-height: 40px; opacity: 1; }
+.duelo-leyenda { display: flex; justify-content: center; align-items: center; gap: 8px; font-size: .84rem; color: rgba(234,242,255,.8); }
+.duelo-leyenda .punto:nth-of-type(2) { margin-left: 10px; }
+.punto { width: 10px; height: 10px; border-radius: 50%; display: inline-block; }
+.punto--yo, .duelo-yo { background: linear-gradient(90deg, #eaf2ff, var(--celeste)); }
+.punto--vos, .duelo-vos { background: linear-gradient(90deg, var(--azul-vivo), #2449ad); }
+.duelo-resumen { font-size: 1.4rem; color: var(--pastel); }
+.duelo { display: none; grid-area: barra; width: 100%; flex-direction: column; gap: 5px; }
+.duelo-activo .duelo { display: flex; }
+.duelo-activo .palabra-barra { display: none; }
+.duelo-barra { display: flex; height: 10px; border-radius: 10px; overflow: hidden; background: rgba(255,255,255,.08); gap: 2px; }
+.duelo-barra i { display: block; height: 100%; transform: scaleX(0); transition: transform 1s var(--suave); }
+.duelo-yo { transform-origin: left; border-radius: 10px 0 0 10px; }
+.duelo-vos { transform-origin: right; border-radius: 0 10px 10px 0; }
+.duelo-activo .duelo-barra i { transform: scaleX(1); }
+.duelo-numeros { display: flex; justify-content: space-between; font-size: .74rem; font-variant-numeric: tabular-nums; color: rgba(234,242,255,.72); }
+.puesto-info .duelo { width: 100%; margin-top: 8px; }
+.puesto-info .duelo-numeros { flex-direction: column; align-items: center; gap: 1px; font-size: .68rem; }
+.duelo-activo .palabra-cant { opacity: .5; }
+
+/* ---------- Corazón tocable ---------- */
+.ilustracion--corazon { padding: 0; border: 0; background: none; cursor: pointer; position: relative; touch-action: manipulation; -webkit-tap-highlight-color: transparent; }
+.ilustracion--corazon:focus-visible { outline: 2px solid var(--pastel); outline-offset: 6px; border-radius: 50%; }
+.ilustracion--corazon::before, .ilustracion--corazon::after {
+  content: '';
+  position: absolute;
+  left: 50%;
+  top: 52%;
+  width: 60%;
+  aspect-ratio: 1;
+  border-radius: 50%;
+  border: 2px solid rgba(158,195,255,.55);
+  transform: translate(-50%, -50%) scale(.6);
+  opacity: 0;
+  pointer-events: none;
+}
+.latiendo.ilustracion--corazon::before { animation: onda-latido 1.25s ease-out infinite; }
+.latiendo.ilustracion--corazon::after { animation: onda-latido 1.25s ease-out .2s infinite; }
+@keyframes onda-latido { 0% { opacity: .8; transform: translate(-50%, -50%) scale(.6); } 70%, 100% { opacity: 0; transform: translate(-50%, -50%) scale(1.6); } }
+.golpe svg { animation: golpe .5s var(--suave); }
+@keyframes golpe { 0% { transform: scale(1); } 30% { transform: scale(1.22); } 60% { transform: scale(.94); } 100% { transform: scale(1); } }
+.secreto {
+  margin: 8px 0 0;
+  max-width: 18em;
+  min-height: 0;
+  text-align: center;
+  font-size: 1.55rem;
+  color: #fff;
+  text-shadow: 0 0 16px rgba(158,195,255,.8);
+  opacity: 0;
+  transform: translateY(10px) scale(.96);
+  transition: opacity 1s ease, transform 1s var(--suave);
+}
+.secreto.visible { opacity: 1; transform: none; }
+
+@media (prefers-reduced-motion: reduce) {
+  .nebulosa { animation: none !important; }
+  .constelacion-linea { stroke-dashoffset: 0; }
+}
+
+/* =====================================================================
+   VERSIÓN 3 — Nosotros en números + Frasco de estrellas
+   ===================================================================== */
+.aura--6 { background: radial-gradient(45% 40% at 85% 20%, rgba(158,195,255,.22), transparent 70%),
+                       radial-gradient(50% 45% at 10% 70%, rgba(91,140,255,.22), transparent 70%); }
+.aura--7 { background: radial-gradient(50% 45% at 50% 55%, rgba(207,224,255,.2), transparent 70%),
+                       radial-gradient(40% 35% at 90% 90%, rgba(91,140,255,.2), transparent 70%); }
+.despedida { -webkit-backdrop-filter: blur(2px); backdrop-filter: blur(2px); background: rgba(3,8,24,.5); }
+
+/* ---------- Números ---------- */
+.cifra-hero { margin-top: 26px; text-align: center; }
+.cifra-hero-num {
+  display: block;
+  font-family: var(--f-titulo);
+  font-weight: 600;
+  font-size: clamp(3.6rem, 17vw, 6rem);
+  line-height: 1;
+  font-variant-numeric: lining-nums tabular-nums;
+  background: linear-gradient(180deg, #ffffff 30%, var(--celeste));
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  filter: drop-shadow(0 0 22px rgba(158,195,255,.45));
+}
+.cifra-hero-texto { display: block; margin-top: 6px; color: rgba(234,242,255,.8); }
+.cifras { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; width: 100%; max-width: 560px; margin-top: 28px; }
+.cifra {
+  position: relative;
+  padding: 18px 16px 16px;
+  border-radius: 20px;
+  background: linear-gradient(160deg, rgba(255,255,255,.1), rgba(255,255,255,.03));
+  border: 1px solid rgba(207,224,255,.18);
+  -webkit-backdrop-filter: blur(8px);
+  backdrop-filter: blur(8px);
+  overflow: hidden;
+  opacity: 0;
+  transform: translateY(24px) scale(.97);
+  transition: opacity .8s var(--suave) var(--retraso), transform .8s var(--suave) var(--retraso);
+}
+.cifra::after { content: ''; position: absolute; right: -30px; top: -30px; width: 90px; height: 90px; border-radius: 50%; background: radial-gradient(circle, rgba(158,195,255,.25), transparent 70%); }
+.cifra.visible { opacity: 1; transform: none; }
+.cifra-valor { display: block; font-family: var(--f-titulo); font-weight: 600; font-size: clamp(2rem, 9vw, 2.6rem); line-height: 1; color: #fff; }
+.cifra-unidad { display: block; font-size: 1.3rem; color: var(--celeste); line-height: 1.1; }
+.cifra-texto { display: block; margin-top: 6px; font-size: .84rem; line-height: 1.4; color: rgba(234,242,255,.75); }
+
+.quien-escribe { width: 100%; max-width: 560px; margin-top: 30px; opacity: 0; transform: translateY(20px); transition: opacity .8s, transform .8s var(--suave); }
+.quien-escribe.visible { opacity: 1; transform: none; }
+.quien-barra { display: flex; gap: 3px; height: 16px; border-radius: 16px; overflow: hidden; background: rgba(255,255,255,.08); }
+.quien-barra i { display: block; height: 100%; width: 0; transition: width 1.6s var(--suave) .2s; }
+.quien-vos { background: linear-gradient(90deg, #2449ad, var(--azul-vivo)); border-radius: 16px 0 0 16px; }
+.quien-yo { background: linear-gradient(90deg, var(--celeste), #eaf2ff); border-radius: 0 16px 16px 0; }
+.quien-escribe.visible .quien-vos { width: var(--vos); }
+.quien-escribe.visible .quien-yo { width: var(--yo); }
+.quien-nums { display: flex; justify-content: space-between; margin-top: 8px; font-size: .86rem; font-weight: 600; font-variant-numeric: tabular-nums; color: rgba(234,242,255,.85); }
+.quien-texto { margin: 6px 0 0; text-align: center; font-size: 1.35rem; color: var(--pastel); }
+
+.emojis { display: flex; justify-content: center; gap: 12px; margin-top: 26px; flex-wrap: wrap; opacity: 0; transform: translateY(16px); transition: opacity .8s, transform .8s var(--suave); }
+.emojis.visible { opacity: 1; transform: none; }
+.emoji-chip { display: inline-flex; align-items: center; gap: 8px; padding: 8px 16px 8px 10px; border-radius: 999px; background: rgba(255,255,255,.08); border: 1px solid rgba(207,224,255,.16); }
+.emoji-icono { font-size: 1.6rem; line-height: 1; }
+.emojis.visible .emoji-chip { animation: emoji-pop .7s var(--suave) both; }
+.emojis.visible .emoji-chip:nth-child(2) { animation-delay: .12s; }
+.emojis.visible .emoji-chip:nth-child(3) { animation-delay: .24s; }
+@keyframes emoji-pop { from { transform: scale(.6); opacity: 0; } 60% { transform: scale(1.08); } to { transform: none; opacity: 1; } }
+
+.reloj-zona { margin-top: 36px; width: 100%; display: flex; flex-direction: column; align-items: center; }
+.reloj-titulo { margin: 0; font-family: var(--f-titulo); font-weight: 600; font-size: 1.8rem; }
+.reloj { width: min(88vw, 340px); margin-top: 8px; }
+.reloj svg { width: 100%; display: block; overflow: visible; }
+.reloj-centro { fill: rgba(11,26,69,.6); stroke: rgba(207,224,255,.2); }
+.reloj-hora { cursor: pointer; outline: none; }
+.reloj-barra {
+  fill: rgba(158,195,255,.45);
+  transform-box: fill-box;
+  transform-origin: 50% 100%;
+  transform: scaleY(0);
+  transition: transform .9s var(--suave), fill .3s;
+}
+.reloj.visible .reloj-barra { transform: scaleY(1); }
+.reloj-hora.pico .reloj-barra { fill: #cfe0ff; filter: drop-shadow(0 0 6px rgba(207,224,255,.9)); }
+.reloj-hora.elegida .reloj-barra { fill: #ffffff; filter: drop-shadow(0 0 8px rgba(255,255,255,.9)); }
+.reloj-hora:focus-visible .reloj-barra { fill: #fff; }
+.reloj-marca { fill: rgba(207,224,255,.7); font-family: var(--f-texto); font-size: 12px; font-weight: 600; }
+.reloj-hora-txt { fill: #fff; font-family: var(--f-titulo); font-weight: 600; font-size: 30px; }
+.reloj-cant-txt { fill: var(--celeste); font-family: var(--f-texto); font-size: 11.5px; font-weight: 600; }
+
+/* ---------- Frasco de estrellas ---------- */
+.frasco-zona { display: flex; flex-direction: column; align-items: center; margin-top: 18px; }
+.frasco {
+  width: min(56vw, 230px);
+  padding: 0;
+  border: 0;
+  background: none;
+  cursor: pointer;
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
+  animation: flotar-frasco 4.5s ease-in-out infinite;
+}
+.frasco svg { width: 100%; display: block; overflow: visible; filter: drop-shadow(0 20px 30px rgba(0,0,0,.45)); }
+.frasco:focus-visible { outline: 2px solid var(--pastel); outline-offset: 8px; border-radius: 24px; }
+@keyframes flotar-frasco { 0%, 100% { transform: translateY(0) rotate(-1.5deg); } 50% { transform: translateY(-8px) rotate(1.5deg); } }
+.frasco.sacudir { animation: sacudir .6s var(--suave); }
+@keyframes sacudir { 0% { transform: rotate(0); } 20% { transform: rotate(-8deg) scale(1.03); } 45% { transform: rotate(7deg); } 70% { transform: rotate(-3deg); } 100% { transform: rotate(0); } }
+.estrellita {
+  fill: #fff7d6;
+  filter: drop-shadow(0 0 4px rgba(255,240,190,.95)) drop-shadow(0 0 8px rgba(158,195,255,.8));
+  transform-box: fill-box;
+  transform-origin: center;
+  animation: estrellita 4s ease-in-out infinite;
+}
+@keyframes estrellita { 0%, 100% { transform: translateY(0) scale(1); opacity: 1; } 50% { transform: translateY(-5px) scale(.8); opacity: .7; } }
+.estrellita.sale { animation: sale-estrella 1.1s cubic-bezier(.3,.7,.2,1) forwards; }
+@keyframes sale-estrella { 0% { transform: translateY(0) scale(1); opacity: 1; } 100% { transform: translateY(-190px) scale(2.4) rotate(160deg); opacity: 0; } }
+.frasco-contador { margin: 4px 0 0; min-height: 1em; }
+.frase {
+  position: relative;
+  width: 100%;
+  max-width: 480px;
+  margin-top: 24px;
+  padding: 26px 24px 22px;
+  text-align: center;
+  border-radius: 24px;
+  background: linear-gradient(160deg, rgba(47,95,208,.45), rgba(11,26,69,.6));
+  border: 1px solid rgba(207,224,255,.28);
+  box-shadow: 0 30px 60px -30px rgba(0,0,0,.8), 0 0 40px rgba(91,140,255,.2);
+  animation: frase-entra .8s var(--suave);
+}
+.frase[hidden] { display: none; }
+.frase--yo { background: linear-gradient(160deg, #f5f8ff, #dfe9ff); color: var(--tinta); }
+.frase--yo .frase-quien { color: var(--azul); }
+.frase--yo .frase-fecha { color: var(--azul); }
+@keyframes frase-entra { from { opacity: 0; transform: translateY(-30px) scale(.9); } to { opacity: 1; transform: none; } }
+.frase-quien { margin: 0; }
+.frase-texto { margin: 10px 0 8px; font-family: var(--f-titulo); font-weight: 500; font-size: clamp(1.4rem, 6vw, 1.85rem); line-height: 1.3; }
+.frase-fecha { margin: 0; font-size: 1.3rem; color: var(--pastel); }
+.frasco-cuentas { display: flex; flex-wrap: wrap; justify-content: center; gap: 10px; margin-top: 26px; }
+.cuenta-chip { display: inline-flex; align-items: baseline; gap: 8px; padding: 8px 14px; border-radius: 999px; background: rgba(255,255,255,.07); border: 1px solid rgba(207,224,255,.16); }
+.cuenta-chip .manuscrita { font-size: 1.3rem; }
+.cuenta-chip b { color: var(--celeste); font-variant-numeric: tabular-nums; }
+@media (prefers-reduced-motion: reduce) {
+  .frasco, .estrellita { animation: none !important; }
+}
+
 </style>
 </head>
 <body>
@@ -1054,9 +1494,15 @@ button { font: inherit; color: inherit; }
     <div class="aura aura--3"></div>
     <div class="aura aura--4"></div>
     <div class="aura aura--5"></div>
+    <div class="aura aura--6"></div>
+    <div class="aura aura--7"></div>
+    <div class="nebulosa"></div>
     <canvas id="estrellas"></canvas>
+    <div class="luz-azul"></div>
+    <div class="vineta"></div>
     <div class="grano"></div>
   </div>
+  <div class="destello-salto" id="destelloSalto" aria-hidden="true"></div>
 
   <!-- ===== Indicador de capítulos ===== -->
   <nav class="capitulos" id="capitulos" aria-label="Progreso"></nav>
@@ -1101,6 +1547,14 @@ button { font: inherit; color: inherit; }
       <div class="nubes" aria-hidden="true"><span></span><span></span><span></span></div>
 
       <div class="inicio-contenido">
+        <svg class="constelacion" viewBox="0 0 200 170" aria-hidden="true">
+          <path class="constelacion-linea" d="M100 52 L 72 30 L 40 34 L 22 62 L 34 98 L 66 128 L 100 152 L 134 128 L 166 98 L 178 62 L 160 34 L 128 30 Z"/>
+          <g class="constelacion-estrellas">
+            <circle cx="100" cy="52" r="3.4"/><circle cx="72" cy="30" r="2.6"/><circle cx="40" cy="34" r="3"/><circle cx="22" cy="62" r="2.4"/>
+            <circle cx="34" cy="98" r="2.8"/><circle cx="66" cy="128" r="2.4"/><circle cx="100" cy="152" r="3.6"/><circle cx="134" cy="128" r="2.4"/>
+            <circle cx="166" cy="98" r="2.8"/><circle cx="178" cy="62" r="2.4"/><circle cx="160" cy="34" r="3"/><circle cx="128" cy="30" r="2.6"/>
+          </g>
+        </svg>
         <p class="manuscrita inicio-dedicatoria" data-txt="inicio.dedicatoria"></p>
         <h1 class="inicio-titulo" data-txt="inicio.titulo"></h1>
         <p class="inicio-frase" data-txt="inicio.frase"></p>
@@ -1116,8 +1570,12 @@ button { font: inherit; color: inherit; }
     <section class="pantalla pantalla--monito" data-aura="1" id="p-monito">
       <div class="pantalla-interior centrado">
         <p class="capitulo-etiqueta">Capítulo I</p>
-        <div class="ilustracion" id="monitoWrap" aria-label="Ilustración de un monito con gorrito de cumpleaños" role="img"></div>
+        <div class="monito-escena">
+          <p class="globo manuscrita" id="globo" aria-live="polite"></p>
+          <button class="ilustracion monito-btn" id="monitoWrap" type="button" aria-label="Monito con gorrito de cumpleaños (tocalo)"></button>
+        </div>
         <h2 class="escritura manuscrita" id="monitoTexto" aria-live="polite"></h2>
+        <p class="pista-toque" id="pistaMonito">tocá al monito</p>
         <div class="zona-boton">
           <button class="btn btn--siguiente" type="button" data-siguiente data-txt="monito.boton"></button>
         </div>
@@ -1181,15 +1639,60 @@ button { font: inherit; color: inherit; }
       <p class="pista-scroll" aria-hidden="true">deslizá <span>↓</span></p>
     </section>
 
+
+    <!-- ============ 3b. NOSOTROS, EN NÚMEROS ============ -->
+    <section class="pantalla pantalla--numeros" data-aura="6" id="p-numeros">
+      <div class="pantalla-interior">
+        <header class="seccion-cabecera">
+          <p class="capitulo-etiqueta">Capítulo IV</p>
+          <h2 class="seccion-titulo" data-txt="numeros.titulo"></h2>
+          <p class="seccion-subtitulo manuscrita" data-txt="numeros.subtitulo"></p>
+        </header>
+
+        <div class="cifra-hero">
+          <span class="cifra-hero-num" id="cifraTotal">0</span>
+          <span class="cifra-hero-texto" data-txt="numeros.totalTexto"></span>
+        </div>
+
+        <div class="cifras" id="cifras"></div>
+
+        <div class="quien-escribe" id="quienEscribe">
+          <div class="quien-barra"><i class="quien-vos"></i><i class="quien-yo"></i></div>
+          <div class="quien-nums"><span id="quienVos"></span><span id="quienYo"></span></div>
+          <p class="manuscrita quien-texto" data-txt="numeros.duelo.texto"></p>
+        </div>
+
+        <div class="emojis" id="emojis"></div>
+
+        <div class="reloj-zona">
+          <h3 class="reloj-titulo" data-txt="numeros.relojTitulo"></h3>
+          <div class="reloj" id="reloj"></div>
+          <p class="pista-toque visible" data-txt="numeros.relojPista"></p>
+        </div>
+
+        <div class="zona-boton">
+          <button class="btn btn--siguiente" type="button" data-siguiente data-txt="numeros.boton"></button>
+        </div>
+      </div>
+      <p class="pista-scroll" aria-hidden="true">deslizá <span>↓</span></p>
+    </section>
+
     <!-- ============ 4. DICCIONARIO ============ -->
     <section class="pantalla pantalla--diccionario" data-aura="4" id="p-diccionario">
       <div class="pantalla-interior">
         <header class="seccion-cabecera">
-          <p class="capitulo-etiqueta">Capítulo IV</p>
+          <p class="capitulo-etiqueta">Capítulo V</p>
           <h2 class="seccion-titulo" data-txt="diccionario.titulo"></h2>
           <p class="seccion-subtitulo manuscrita" data-txt="diccionario.subtitulo"></p>
         </header>
 
+        <div class="modo" role="group" aria-label="Cómo ver las palabras">
+          <button type="button" class="modo-btn activo" data-modo="juntos" aria-pressed="true" data-txt="diccionario.botonJuntos"></button>
+          <button type="button" class="modo-btn" data-modo="duelo" aria-pressed="false" data-txt="diccionario.botonDuelo"></button>
+          <span class="modo-indicador" aria-hidden="true"></span>
+        </div>
+        <p class="duelo-leyenda" aria-hidden="true"><span class="punto punto--yo"></span><span data-txt="diccionario.nombreYo"></span><span class="punto punto--vos"></span><span data-txt="diccionario.nombreVos"></span></p>
+        <p class="duelo-resumen manuscrita" id="dueloResumen"></p>
         <div class="podio" id="podio" aria-label="Las tres palabras más usadas"></div>
         <ol class="palabras" id="palabras"></ol>
         <p class="diccionario-nota" data-txt="diccionario.nota"></p>
@@ -1201,12 +1704,66 @@ button { font: inherit; color: inherit; }
       <p class="pista-scroll" aria-hidden="true">deslizá <span>↓</span></p>
     </section>
 
+
+    <!-- ============ 4b. EL FRASCO DE ESTRELLAS ============ -->
+    <section class="pantalla pantalla--frasco" data-aura="7" id="p-frasco">
+      <div class="pantalla-interior">
+        <header class="seccion-cabecera">
+          <p class="capitulo-etiqueta">Capítulo VI</p>
+          <h2 class="seccion-titulo" data-txt="frasco.titulo"></h2>
+          <p class="seccion-subtitulo manuscrita" data-txt="frasco.subtitulo"></p>
+        </header>
+
+        <div class="frasco-zona">
+          <button class="frasco" id="frasco" type="button" aria-label="Sacar una estrella del frasco">
+            <svg viewBox="0 0 200 250" aria-hidden="true">
+              <defs>
+                <linearGradient id="vidrio" x1="0" y1="0" x2="1" y2="0">
+                  <stop offset="0" stop-color="#cfe0ff" stop-opacity=".28"/>
+                  <stop offset=".25" stop-color="#ffffff" stop-opacity=".1"/>
+                  <stop offset=".7" stop-color="#9ec3ff" stop-opacity=".06"/>
+                  <stop offset="1" stop-color="#cfe0ff" stop-opacity=".3"/>
+                </linearGradient>
+                <radialGradient id="brilloFrasco" cx="50%" cy="60%" r="55%">
+                  <stop offset="0" stop-color="#9ec3ff" stop-opacity=".45"/>
+                  <stop offset="1" stop-color="#9ec3ff" stop-opacity="0"/>
+                </radialGradient>
+              </defs>
+              <ellipse cx="100" cy="150" rx="90" ry="90" fill="url(#brilloFrasco)"/>
+              <rect x="62" y="18" width="76" height="22" rx="6" fill="#c9d3e6"/>
+              <rect x="62" y="18" width="76" height="8" rx="4" fill="#ffffff" opacity=".6"/>
+              <path d="M66 40 h68 v10 c 0 8, 34 20, 34 56 v 104 c 0 18, -14 30, -32 30 h -72 c -18 0, -32 -12, -32 -30 v -104 c 0 -36, 34 -48, 34 -56 z" fill="url(#vidrio)" stroke="#dfe9ff" stroke-opacity=".75" stroke-width="2"/>
+              <path d="M48 112 c 0 -14, 8 -24, 18 -30" fill="none" stroke="#fff" stroke-opacity=".6" stroke-width="5" stroke-linecap="round"/>
+              <g class="frasco-estrellas" id="frascoEstrellas"></g>
+            </svg>
+          </button>
+          <p class="pista-toque visible" id="pistaFrasco" data-txt="frasco.pista"></p>
+          <p class="frasco-contador mono-chico" id="frascoContador"></p>
+        </div>
+
+        <article class="frase" id="frase" hidden aria-live="polite">
+          <p class="frase-quien mono-chico" id="fraseQuien"></p>
+          <p class="frase-texto" id="fraseTexto"></p>
+          <p class="frase-fecha manuscrita" id="fraseFecha"></p>
+        </article>
+
+        <div class="frasco-cuentas" id="frascoCuentas"></div>
+
+        <div class="zona-boton">
+          <button class="btn btn--siguiente" type="button" data-siguiente data-txt="frasco.boton"></button>
+        </div>
+      </div>
+      <p class="pista-scroll" aria-hidden="true">deslizá <span>↓</span></p>
+    </section>
+
     <!-- ============ 5. EL CORAZÓN ============ -->
     <section class="pantalla pantalla--final" data-aura="5" id="p-final">
       <div class="pantalla-interior centrado">
         <p class="capitulo-etiqueta">Capítulo final</p>
-        <div class="ilustracion ilustracion--corazon" id="corazonWrap" aria-label="Un corazón que se dibuja y late" role="img"></div>
+        <button class="ilustracion ilustracion--corazon" id="corazonWrap" type="button" aria-label="Un corazón que late (tocalo)"></button>
         <h2 class="escritura manuscrita" id="finalTexto" aria-live="polite"></h2>
+        <p class="pista-toque" id="pistaCorazon">tocá el corazón</p>
+        <p class="secreto manuscrita" id="secretoCorazon" aria-live="polite"></p>
         <div class="zona-boton">
           <button class="btn btn--salir" type="button" id="btnSalir" data-txt="final.botonSalir"></button>
         </div>
@@ -1287,6 +1844,8 @@ const DATOS = {
   monito: {
     mensaje: 'Feliz cumpleaños patito',
     boton: 'Hay algo más para vos',
+    // lo que dice el monito cada vez que lo tocás
+    globos: ['uh uh ah ah 🐒', '¡feliz cumple!', '🍌', '¿y mi banana?', 'te quiere mucho 💙', '¡otra vez!'],
   },
 
   /* ------------------------------------------------------------------
@@ -1330,6 +1889,7 @@ const DATOS = {
     titulo: 'Nuestra historia',
     subtitulo: 'Una constelación hecha de momentos',
     boton: 'Hay más cositas…',
+    pista: 'Tocá cada recuerdo para darlo vuelta',
     recuerdos: [
       {
         fecha: '2 de septiembre, 2025',
@@ -1425,46 +1985,115 @@ const DATOS = {
     ],
   },
 
+
+  /* ------------------------------------------------------------------
+     📊 NOSOTROS, EN NÚMEROS (todo sale del chat de WhatsApp)
+     ------------------------------------------------------------------ */
+  numeros: {
+    titulo: 'Nosotros, en números',
+    subtitulo: 'Medido con amor (y con WhatsApp)',
+    total: 214463,
+    totalTexto: 'mensajes desde el 2 de septiembre de 2025',
+    tarjetas: [
+      { valor: '428', unidad: 'de 431 días', texto: 'hablamos. Solo 3 días sin escribirnos.' },
+      { valor: '203', unidad: 'días seguidos', texto: 'nuestra racha más larga sin cortar.' },
+      { valor: '501', unidad: 'por día', texto: 'mensajes, en promedio.' },
+      { valor: '2.292', unidad: 'en un día', texto: 'el récord: 14 de enero de 2026.' },
+      { valor: '9.320', unidad: 'de madrugada', texto: 'mensajes entre las 00 y las 5 de la mañana.' },
+      { valor: '32.684', unidad: 'fotos y audios', texto: 'stickers incluidos.' },
+    ],
+    duelo: { vos: 121708, yo: 92755, texto: 'Vos me escribiste más. Lo dicen los números, no yo.' },
+    emojis: [ { emoji: '❤️', veces: 865 }, { emoji: '🫶', veces: 764 }, { emoji: '🤌', veces: 275 } ],
+    relojTitulo: '¿A qué hora hablamos?',
+    // mensajes por hora, de las 00 a las 23
+    horas: [7846, 984, 380, 25, 85, 52, 277, 1757, 3057, 5386, 8138, 9800, 8567, 9153, 14129, 10917, 12554, 13454, 13198, 10114, 10158, 15785, 30858, 27789],
+    relojPista: 'Tocá una hora',
+    boton: 'Sigamos con las palabras',
+  },
+
   /* ------------------------------------------------------------------
      💬 NUESTRO DICCIONARIO
-     palabra:  el apodo o la expresión
-     cantidad: cuántas veces la usaron (número, sin comillas)
+     palabra: el apodo o la expresión
+     yo:      cuántas veces la escribí yo (Santi)
+     vos:     cuántas veces la escribió él (Pabli)
+     El total es la suma. Números sin comillas.
      No hace falta ordenarlas: el podio y la lista se ordenan solos.
      ------------------------------------------------------------------ */
   diccionario: {
     titulo: 'Nuestro diccionario',
+    nombreYo: 'Yo',
+    nombreVos: 'Vos',
+    botonJuntos: 'Juntos',
+    botonDuelo: '¿Quién lo dice más?',
     subtitulo: 'Un idioma que solamente nosotros entendemos',
     nota: '*Contado en todo nuestro chat de WhatsApp, desde el 2/9/2025 hasta hoy, sumando lo que escribimos los dos. «jajaja» incluye todas sus versiones (jaja, jajajaja, jajjaja…). Datos 100% científicos.',
-    boton: 'Y ahora, una última cosa',
+    boton: 'Todavía hay más…',
     palabras: [
-      { palabra: 'te amo', cantidad: 6269 },
-      { palabra: 'jajaja', cantidad: 4656 },
-      { palabra: 'amor', cantidad: 4163 },
-      { palabra: 'gordo', cantidad: 3717 },
-      { palabra: 'gordito', cantidad: 2487 },
-      { palabra: 'te extraño', cantidad: 1167 },
-      { palabra: 'wiii', cantidad: 1206 },
-      { palabra: 'Pabli', cantidad: 1071 },
-      { palabra: 'hermoso', cantidad: 957 },
-      { palabra: 'amorcito', cantidad: 840 },
-      { palabra: 'gordi', cantidad: 829 },
-      { palabra: 'mueno', cantidad: 827 },
-      { palabra: 'mi vida', cantidad: 609 },
-      { palabra: 'buen día', cantidad: 572 },
-      { palabra: 'buenas noches', cantidad: 511 },
-      { palabra: 'mimos', cantidad: 366 },
-      { palabra: 'cosita', cantidad: 365 },
-      { palabra: 'provechito', cantidad: 320 },
-      { palabra: 'tomatito', cantidad: 271 },
-      { palabra: 'mor', cantidad: 169 },
-      { palabra: 'sipirili', cantidad: 145 },
-      { palabra: 'noporolo', cantidad: 138 },
-      { palabra: 'cacatúa', cantidad: 132 },
-      { palabra: 'puchuchito', cantidad: 95 },
-      { palabra: 'gordototon', cantidad: 80 },
-      { palabra: 'amordopolis', cantidad: 41 },
-      { palabra: 'gordinho', cantidad: 39 },
+      { palabra: 'te amo', yo: 3367, vos: 2902 },
+      { palabra: 'jajaja', yo: 1931, vos: 2725 },
+      { palabra: 'amor', yo: 742, vos: 3421 },
+      { palabra: 'gordo', yo: 1331, vos: 2386 },
+      { palabra: 'gordito', yo: 1448, vos: 1039 },
+      { palabra: 'te extraño', yo: 492, vos: 675 },
+      { palabra: 'wiii', yo: 646, vos: 560 },
+      { palabra: 'Pabli', yo: 1066, vos: 5 },
+      { palabra: 'hermoso', yo: 511, vos: 446 },
+      { palabra: 'amorcito', yo: 196, vos: 644 },
+      { palabra: 'gordi', yo: 274, vos: 555 },
+      { palabra: 'mueno', yo: 125, vos: 702 },
+      { palabra: 'mi vida', yo: 242, vos: 367 },
+      { palabra: 'buen día', yo: 270, vos: 302 },
+      { palabra: 'buenas noches', yo: 292, vos: 219 },
+      { palabra: 'mimos', yo: 55, vos: 311 },
+      { palabra: 'cosita', yo: 186, vos: 179 },
+      { palabra: 'provechito', yo: 291, vos: 29 },
+      { palabra: 'tomatito', yo: 260, vos: 11 },
+      { palabra: 'mor', yo: 163, vos: 6 },
+      { palabra: 'sipirili', yo: 145, vos: 0 },
+      { palabra: 'noporolo', yo: 138, vos: 0 },
+      { palabra: 'cacatúa', yo: 125, vos: 7 },
+      { palabra: 'puchuchito', yo: 52, vos: 43 },
+      { palabra: 'gordototon', yo: 80, vos: 0 },
+      { palabra: 'amordopolis', yo: 41, vos: 0 },
+      { palabra: 'gordinho', yo: 38, vos: 1 },
     ],
+  },
+
+
+  /* ------------------------------------------------------------------
+     ✨ EL FRASCO DE ESTRELLAS: frases reales del chat
+     quien: 'vos' (lo dijo él) o 'yo' (lo dije yo)
+     ------------------------------------------------------------------ */
+  frasco: {
+    titulo: 'El frasco de estrellas',
+    subtitulo: 'Cosas que nos dijimos de verdad',
+    pista: 'Tocá el frasco',
+    cuentas: [
+      { frase: '«Me hacés feliz»', veces: 63 },
+      { frase: '«Te elijo»', veces: 23 },
+      { frase: '«Para siempre»', veces: 19 },
+    ],
+    frases: [
+      { quien: 'vos', fecha: '16/9/2025', texto: 'Estuviste en mi hogar, en mi lugar seguro' },
+      { quien: 'vos', fecha: '18/9/2025', texto: 'Te veo como alguien q me gustaría estar para siempre' },
+      { quien: 'yo',  fecha: '4/10/2025', texto: 'llegaste y me cambiaste gordo' },
+      { quien: 'vos', fecha: '28/10/2025', texto: 'No quiero conocer a nadie q no seas vos' },
+      { quien: 'vos', fecha: '2/11/2025', texto: 'Y nunca me sentí tan en paz' },
+      { quien: 'yo',  fecha: '3/11/2025', texto: 'vos sos mi lugar seguro' },
+      { quien: 'vos', fecha: '26/11/2025', texto: 'Nunca me sentí tan cómodo, como con vos' },
+      { quien: 'vos', fecha: '13/12/2025', texto: 'Te elijo hoy y siempre' },
+      { quien: 'yo',  fecha: '18/12/2025', texto: 'pero vos SOS mi hogar' },
+      { quien: 'vos', fecha: '20/12/2025', texto: 'Sos lo mejor de mi 2025' },
+      { quien: 'yo',  fecha: '26/12/2025', texto: 'estoy enamorado de vos ❣️' },
+      { quien: 'yo',  fecha: '31/12/2025', texto: 'lo mejor que me pasó este año fue conocerte y enamorarme de vos' },
+      { quien: 'vos', fecha: '29/1/2026', texto: 'Te amo con mi alma ❤️ me haces feliz y me cambiaste la vida' },
+      { quien: 'vos', fecha: '28/3/2026', texto: 'ME haces tan feliz' },
+      { quien: 'yo',  fecha: '25/5/2026', texto: 'orgullosamente digo que sos mi novio' },
+      { quien: 'yo',  fecha: '1/6/2026', texto: 'yo te elijo cada día' },
+    ],
+    nombreYo: 'Yo',
+    nombreVos: 'Vos',
+    boton: 'Y ahora, una última cosa',
   },
 
   /* ------------------------------------------------------------------
@@ -1477,6 +2106,8 @@ const DATOS = {
     despedidaTexto: 'Este pedacito de cielo es tuyo. Podés volver cada vez que quieras.',
     botonReiniciar: 'Volver a empezar',
     botonQuedarse: 'Quedarme mirando el corazón',
+    // aparece después de tocar el corazón varias veces
+    secreto: 'Llevamos 6.269 «te amo» en el chat… y contando.',
   },
 };
 
@@ -1520,10 +2151,10 @@ const ILUSTRACIONES = (() => {
   <!-- cara -->
   <path class="t" data-o="6" d="M120 116 C 108 98, 78 100, 78 128 C 78 144, 86 151, 92 156 C 84 172, 96 188, 120 188 C 144 188, 156 172, 148 156 C 154 151, 162 144, 162 128 C 162 100, 132 98, 120 116 Z" fill="${CARA}" stroke="${L}" stroke-width="2.2"/>
   <!-- ojos -->
-  <circle class="t" data-o="7" cx="103" cy="134" r="7.5" fill="${D}" stroke="${D}" stroke-width="2"/>
-  <circle class="t" data-o="7" cx="137" cy="134" r="7.5" fill="${D}" stroke="${D}" stroke-width="2"/>
-  <circle class="brillo-ojo" cx="105.8" cy="131" r="2.5" fill="#fff"/>
-  <circle class="brillo-ojo" cx="139.8" cy="131" r="2.5" fill="#fff"/>
+  <g class="ojo"><circle class="t" data-o="7" cx="103" cy="134" r="7.5" fill="${D}" stroke="${D}" stroke-width="2"/>
+  <circle class="brillo-ojo" cx="105.8" cy="131" r="2.5" fill="#fff"/></g>
+  <g class="ojo"><circle class="t" data-o="7" cx="137" cy="134" r="7.5" fill="${D}" stroke="${D}" stroke-width="2"/>
+  <circle class="brillo-ojo" cx="139.8" cy="131" r="2.5" fill="#fff"/></g>
   <!-- cachetes -->
   <ellipse class="cachete" cx="91" cy="162" rx="9" ry="5.5" fill="#f4a6b8"/>
   <ellipse class="cachete" cx="149" cy="162" rx="9" ry="5.5" fill="#f4a6b8"/>
@@ -1837,6 +2468,35 @@ const Musica = (() => {
   $$('[data-txt]').forEach((el) => { el.textContent = leer(el.dataset.txt); });
 
   /* ------------------------------------------------------------------
+     Luz azul que sigue al mouse o al dedo + botones "magnéticos"
+     ------------------------------------------------------------------ */
+  const raiz = document.documentElement;
+  const luz = { x: innerWidth / 2, y: innerHeight * 0.4, tx: innerWidth / 2, ty: innerHeight * 0.4, t: 0 };
+  addEventListener('pointermove', (e) => { luz.tx = e.clientX; luz.ty = e.clientY; luz.t = performance.now(); }, { passive: true });
+  addEventListener('pointerdown', (e) => { luz.tx = e.clientX; luz.ty = e.clientY; luz.t = performance.now(); }, { passive: true });
+  (function moverLuz(t) {
+    if (!MOV_REDUCIDO && t - luz.t > 4000) {
+      luz.tx = innerWidth * (0.5 + Math.sin(t / 5600) * 0.28);
+      luz.ty = innerHeight * (0.4 + Math.cos(t / 6400) * 0.18);
+    }
+    luz.x += (luz.tx - luz.x) * 0.06;
+    luz.y += (luz.ty - luz.y) * 0.06;
+    raiz.style.setProperty('--mx', `${luz.x}px`);
+    raiz.style.setProperty('--my', `${luz.y}px`);
+    requestAnimationFrame(moverLuz);
+  })(0);
+  if (window.matchMedia('(pointer: fine)').matches && !MOV_REDUCIDO) {
+    document.addEventListener('pointermove', (e) => {
+      const b = e.target.closest('.btn');
+      $$('.btn.iman').forEach((x) => { if (x !== b) { x.classList.remove('iman'); x.style.translate = ''; } });
+      if (!b || b.disabled) return;
+      const r = b.getBoundingClientRect();
+      b.classList.add('iman');
+      b.style.translate = `${((e.clientX - r.left) / r.width - 0.5) * 10}px ${((e.clientY - r.top) / r.height - 0.5) * 8}px`;
+    });
+  }
+
+  /* ------------------------------------------------------------------
      Navegación entre pantallas
      ------------------------------------------------------------------ */
   const pantallas = $$('.pantalla');
@@ -1872,6 +2532,7 @@ const Musica = (() => {
     const hacia = pantallas[indice];
 
     desde.classList.add('saliendo');
+    Cielo.salto();
     cambiarAura(hacia.dataset.aura);
     await esperar(T(650));
     desde.classList.remove('activa', 'saliendo');
@@ -1980,6 +2641,8 @@ const Musica = (() => {
     const wrap = $('#monitoWrap');
     const texto = $('#monitoTexto');
     texto.textContent = '';
+    $('#pistaMonito').classList.remove('visible');
+    $('#globo').classList.remove('visible');
     wrap.innerHTML = ILUSTRACIONES.monito;
     wrap.classList.remove('terminado');
     await esperar(T(400));
@@ -1989,8 +2652,28 @@ const Musica = (() => {
     const r = wrap.getBoundingClientRect();
     Cielo.explosion(r.left + r.width / 2, r.top + r.height * 0.3, 18);
     const ok = await escribir(texto, DATOS.monito.mensaje, miCiclo);
-    if (ok) mostrarBoton($('#p-monito'));
+    if (ok) {
+      mostrarBoton($('#p-monito'));
+      if (!toquesMonito) $('#pistaMonito').classList.add('visible');
+    }
   };
+
+  let toquesMonito = 0;
+  $('#monitoWrap').addEventListener('click', (e) => {
+    const wrap = e.currentTarget;
+    if (!wrap.classList.contains('terminado')) return;
+    wrap.classList.remove('salto'); void wrap.offsetWidth; wrap.classList.add('salto');
+    const r = wrap.getBoundingClientRect();
+    Cielo.explosion(r.left + r.width / 2, r.top + r.height * 0.35, 16);
+    const globos = DATOS.monito.globos || [];
+    const globo = $('#globo');
+    if (globos.length) {
+      globo.textContent = globos[toquesMonito % globos.length];
+      globo.classList.remove('visible'); void globo.offsetWidth; globo.classList.add('visible');
+    }
+    toquesMonito++;
+    $('#pistaMonito').classList.remove('visible');
+  });
 
   /* ------------------------------------------------------------------
      2. LA CARTA
@@ -2069,6 +2752,10 @@ const Musica = (() => {
      ------------------------------------------------------------------ */
   (function prepararHistoria() {
     const lista = $('#recuerdos');
+    const pista = document.createElement('p');
+    pista.className = 'pista-toque visible pista-historia';
+    pista.textContent = DATOS.historia.pista || '';
+    $('#p-historia .seccion-cabecera').appendChild(pista);
     DATOS.historia.recuerdos.forEach((rec, i) => {
       const li = document.createElement('li');
       li.className = `recuerdo ${i % 2 ? 'recuerdo--der' : 'recuerdo--izq'}`;
@@ -2076,27 +2763,37 @@ const Musica = (() => {
       const tieneFoto = rec.foto && rec.foto.trim() !== '';
       li.innerHTML = `
         <span class="recuerdo-nodo">${ILUSTRACIONES.icono(rec.icono)}</span>
-        <div class="recuerdo-tarjeta">
-          ${tieneFoto ? `
-          <button class="recuerdo-foto" type="button" aria-label="Ampliar foto: ${escaparAttr(rec.titulo)}">
-            <span class="cinta" aria-hidden="true"></span>
-            <img src="${escaparAttr(rec.foto)}" alt="${escaparAttr(rec.titulo)}" loading="lazy" decoding="async" />
-          </button>` : `
-          <span class="recuerdo-simbolo" aria-hidden="true">${ILUSTRACIONES.icono(rec.icono)}</span>`}
-          <p class="recuerdo-fecha manuscrita"></p>
-          <h3 class="recuerdo-titulo"></h3>
-          <p class="recuerdo-texto"></p>
-          <span class="recuerdo-deco" aria-hidden="true">${ILUSTRACIONES.icono(rec.icono)}</span>
-        </div>`;
+        <button class="recuerdo-flip" type="button" aria-pressed="false">
+          <span class="cara cara--frente">
+            ${tieneFoto
+              ? `<img class="recuerdo-img" src="${escaparAttr(rec.foto)}" alt="" loading="lazy" decoding="async" />`
+              : `<span class="recuerdo-simbolo" aria-hidden="true">${ILUSTRACIONES.icono(rec.icono)}</span>`}
+            <span class="recuerdo-num mono-chico">${String(i + 1).padStart(2, '0')}</span>
+            <span class="recuerdo-fecha manuscrita"></span>
+            <span class="recuerdo-titulo"></span>
+            <span class="recuerdo-girar" aria-hidden="true">tocá para descubrir ↻</span>
+          </span>
+          <span class="cara cara--dorso">
+            <span class="recuerdo-fecha-chica mono-chico"></span>
+            <span class="recuerdo-texto"></span>
+            <span class="recuerdo-deco" aria-hidden="true">${ILUSTRACIONES.icono(rec.icono)}</span>
+          </span>
+        </button>`;
       $('.recuerdo-fecha', li).textContent = rec.fecha;
       $('.recuerdo-titulo', li).textContent = rec.titulo;
+      $('.recuerdo-fecha-chica', li).textContent = rec.fecha;
       $('.recuerdo-texto', li).textContent = rec.descripcion;
-      const fotoBtn = $('.recuerdo-foto', li);
-      if (fotoBtn) {
-        const img = $('img', fotoBtn);
-        img.addEventListener('error', () => { fotoBtn.classList.add('rota'); });
-        fotoBtn.addEventListener('click', () => abrirVisor(rec.foto, rec.titulo));
-      }
+      const flip = $('.recuerdo-flip', li);
+      flip.setAttribute('aria-label', `${rec.fecha}: ${rec.titulo}. Tocá para leer el recuerdo.`);
+      flip.addEventListener('click', () => {
+        const girada = li.classList.toggle('girada');
+        flip.setAttribute('aria-pressed', String(girada));
+        if (girada) {
+          const r = flip.getBoundingClientRect();
+          Cielo.explosion(r.left + r.width / 2, r.top + 20, 8);
+          $('.pista-historia')?.classList.add('usada');
+        }
+      });
       lista.appendChild(li);
     });
   })();
@@ -2171,9 +2868,32 @@ const Musica = (() => {
     const lista = $('#palabras');
     const palabras = DATOS.diccionario.palabras
       .filter((p) => p && p.palabra !== undefined)
-      .map((p) => ({ palabra: String(p.palabra), cantidad: Math.max(0, Number(p.cantidad) || 0) }))
+      .map((p) => {
+        const yo = Math.max(0, Number(p.yo) || 0);
+        const vos = Math.max(0, Number(p.vos) || 0);
+        const cantidad = p.cantidad !== undefined ? Math.max(0, Number(p.cantidad) || 0) : yo + vos;
+        return { palabra: String(p.palabra), cantidad, yo, vos, hayDuelo: yo + vos > 0 };
+      })
       .sort((a, b) => b.cantidad - a.cantidad);
     const maximo = palabras.length ? palabras[0].cantidad || 1 : 1;
+
+    const NY = DATOS.diccionario.nombreYo || 'Yo';
+    const NV = DATOS.diccionario.nombreVos || 'Vos';
+    function duelo(d) {
+      if (!d.hayDuelo) return '';
+      const p = Math.round((d.yo / (d.yo + d.vos)) * 100);
+      return `<span class="duelo" aria-label="${NY}: ${formatear(d.yo)}, ${NV}: ${formatear(d.vos)}">
+          <span class="duelo-barra"><i class="duelo-yo" style="width:${p}%"></i><i class="duelo-vos" style="width:${100 - p}%"></i></span>
+          <span class="duelo-numeros"><span>${NY} ${formatear(d.yo)}</span><span>${formatear(d.vos)} ${NV}</span></span>
+        </span>`;
+    }
+    const conDuelo = palabras.filter((d) => d.hayDuelo);
+    const ganaYo = conDuelo.filter((d) => d.yo > d.vos).length;
+    const ganaVos = conDuelo.filter((d) => d.vos > d.yo).length;
+    $('#dueloResumen').textContent = conDuelo.length
+      ? `${NV} ganás en ${ganaVos} palabras, ${NY.toLowerCase()} en ${ganaYo}.`
+      : '';
+    pantalla.classList.toggle('sin-duelo', !conDuelo.length);
 
     // Podio: se ubica 2º - 1º - 3º
     podio.innerHTML = '';
@@ -2192,6 +2912,7 @@ const Musica = (() => {
           ${coronas[i] ? `<span class="puesto-corona">${coronas[i]}</span>` : ''}
           <span class="puesto-palabra manuscrita"></span>
           <span class="puesto-cantidad"><b>0</b> veces</span>
+          ${duelo(d)}
         </div>
         <div class="puesto-bloque"><span class="puesto-numero">${etiquetas[i]}</span></div>`;
       $('.puesto-palabra', col).textContent = d.palabra;
@@ -2209,7 +2930,8 @@ const Musica = (() => {
         <span class="palabra-pos">${k + 4}</span>
         <span class="palabra-nombre"></span>
         <span class="palabra-cant">${formatear(d.cantidad)}</span>
-        <span class="palabra-barra" aria-hidden="true"><i></i></span>`;
+        <span class="palabra-barra" aria-hidden="true"><i></i></span>
+        ${duelo(d)}`;
       $('.palabra-nombre', li).textContent = d.palabra;
       lista.appendChild(li);
     });
@@ -2223,6 +2945,7 @@ const Musica = (() => {
     let terminar;
     const fin = new Promise((r) => { terminar = r; });
     botonAlLlegarAlFinal(pantalla, fin, miCiclo);
+    elegirModo('juntos');
 
     await esperar(T(700));
     // Aparición progresiva: 3º, después 2º y al final 1º
@@ -2245,6 +2968,152 @@ const Musica = (() => {
     terminar();
   };
 
+  function elegirModo(modo) {
+    const pantalla = $('#p-diccionario');
+    pantalla.classList.toggle('duelo-activo', modo === 'duelo');
+    $$('.modo-btn').forEach((b) => {
+      const activo = b.dataset.modo === modo;
+      b.classList.toggle('activo', activo);
+      b.setAttribute('aria-pressed', String(activo));
+    });
+  }
+  $$('.modo-btn').forEach((b) => b.addEventListener('click', () => {
+    elegirModo(b.dataset.modo);
+    if (b.dataset.modo === 'duelo') {
+      $$('#palabras .palabra').forEach((li) => li.classList.add('visible'));
+      const r = b.getBoundingClientRect();
+      Cielo.explosion(r.left + r.width / 2, r.top + r.height / 2, 10);
+    }
+  }));
+
+
+  /* ------------------------------------------------------------------
+     NOSOTROS, EN NÚMEROS
+     ------------------------------------------------------------------ */
+  (function prepararNumeros() {
+    const N = DATOS.numeros;
+    if (!N) return;
+    const cifras = $('#cifras');
+    N.tarjetas.forEach((c, i) => {
+      const d = document.createElement('div');
+      d.className = 'cifra';
+      d.style.setProperty('--retraso', `${(i % 2) * 120 + Math.floor(i / 2) * 60}ms`);
+      d.innerHTML = '<span class="cifra-valor"></span><span class="cifra-unidad manuscrita"></span><span class="cifra-texto"></span>';
+      $('.cifra-valor', d).textContent = c.valor;
+      $('.cifra-unidad', d).textContent = c.unidad;
+      $('.cifra-texto', d).textContent = c.texto;
+      cifras.appendChild(d);
+    });
+    const tot = N.duelo.vos + N.duelo.yo;
+    const pv = (N.duelo.vos / tot) * 100;
+    $('#quienEscribe').style.setProperty('--vos', `${pv}%`);
+    $('#quienEscribe').style.setProperty('--yo', `${100 - pv}%`);
+    $('#quienVos').textContent = `${DATOS.frasco ? DATOS.frasco.nombreVos : 'Vos'} ${formatear(N.duelo.vos)}`;
+    $('#quienYo').textContent = `${formatear(N.duelo.yo)} ${DATOS.frasco ? DATOS.frasco.nombreYo : 'Yo'}`;
+    $('#emojis').innerHTML = N.emojis.map((e) => `<span class="emoji-chip"><span class="emoji-icono">${e.emoji}</span><b>${formatear(e.veces)}</b></span>`).join('');
+
+    // Reloj de 24 horas
+    const max = Math.max(...N.horas);
+    const pico = N.horas.indexOf(max);
+    const C = 160, R0 = 64, L = 86;
+    let barras = '';
+    N.horas.forEach((v, h) => {
+      const largo = Math.max(4, (v / max) * L);
+      barras += `<g class="reloj-hora${h === pico ? ' pico' : ''}" data-h="${h}" tabindex="0" role="button" aria-label="${h} h: ${formatear(v)} mensajes" transform="rotate(${h * 15} ${C} ${C})">
+        <rect class="reloj-toque" x="${C - 9}" y="${C - R0 - L - 6}" width="18" height="${L + 10}" fill="transparent"/>
+        <rect class="reloj-barra" x="${C - 5}" y="${C - R0 - largo}" width="10" height="${largo}" rx="5" style="transition-delay:${h * 35}ms"/>
+      </g>`;
+    });
+    const marcas = [0, 6, 12, 18].map((h) => {
+      const a = (h * 15 - 90) * Math.PI / 180;
+      return `<text class="reloj-marca" x="${C + Math.cos(a) * (R0 + L + 22)}" y="${C + Math.sin(a) * (R0 + L + 22) + 4}" text-anchor="middle">${h} h</text>`;
+    }).join('');
+    $('#reloj').innerHTML = `<svg viewBox="-20 -20 360 360" aria-label="Mensajes según la hora del día">
+      <circle cx="${C}" cy="${C}" r="${R0 - 6}" class="reloj-centro"/>
+      ${barras}${marcas}
+      <text x="${C}" y="${C - 6}" text-anchor="middle" class="reloj-hora-txt" id="relojHora"></text>
+      <text x="${C}" y="${C + 18}" text-anchor="middle" class="reloj-cant-txt" id="relojCant"></text>
+    </svg>`;
+    function elegirHora(h) {
+      $$('.reloj-hora', $('#reloj')).forEach((g) => g.classList.toggle('elegida', Number(g.dataset.h) === h));
+      $('#relojHora').textContent = `${String(h).padStart(2, '0')} h`;
+      $('#relojCant').textContent = `${formatear(N.horas[h])} mensajes`;
+    }
+    elegirHora(pico);
+    $$('.reloj-hora', $('#reloj')).forEach((g) => {
+      const h = Number(g.dataset.h);
+      g.addEventListener('click', () => elegirHora(h));
+      g.addEventListener('pointerenter', () => elegirHora(h));
+      g.addEventListener('keydown', (e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); elegirHora(h); } });
+    });
+  })();
+
+  alEntrar['p-numeros'] = (miCiclo) => {
+    const pantalla = $('#p-numeros');
+    const N = DATOS.numeros;
+    contar($('#cifraTotal'), N.total, T(2200));
+    const io = new IntersectionObserver((ents) => {
+      ents.forEach((e) => { if (e.isIntersecting) { e.target.classList.add('visible'); io.unobserve(e.target); } });
+    }, { root: pantalla, threshold: 0.2 });
+    [...$$('.cifra', pantalla), $('#quienEscribe'), $('#emojis'), $('#reloj')].forEach((el) => { el.classList.remove('visible'); io.observe(el); });
+    setTimeout(() => pistaScroll(pantalla), T(1200));
+    botonAlLlegarAlFinal(pantalla, esperar(T(1600)), miCiclo);
+  };
+
+  /* ------------------------------------------------------------------
+     EL FRASCO DE ESTRELLAS
+     ------------------------------------------------------------------ */
+  const F = DATOS.frasco;
+  let mazoFrases = [];
+  let frasesSacadas = 0;
+  let resolverFrasco = null;
+  function llenarFrasco() {
+    const g = $('#frascoEstrellas');
+    g.innerHTML = '';
+    F.frases.forEach((_, i) => {
+      const x = 62 + Math.random() * 76;
+      const y = 112 + Math.random() * 100;
+      const r = 4 + Math.random() * 3.5;
+      g.insertAdjacentHTML('beforeend',
+        `<path class="estrellita" style="animation-delay:${(-Math.random() * 4).toFixed(2)}s" d="M${x} ${y - r * 2}Q${x} ${y} ${x + r * 2} ${y}Q${x} ${y} ${x} ${y + r * 2}Q${x} ${y} ${x - r * 2} ${y}Q${x} ${y} ${x} ${y - r * 2}Z"/>`);
+    });
+    mazoFrases = F.frases.map((_, i) => i);
+    for (let i = mazoFrases.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [mazoFrases[i], mazoFrases[j]] = [mazoFrases[j], mazoFrases[i]]; }
+  }
+  if (F) {
+    llenarFrasco();
+    $('#frascoCuentas').innerHTML = F.cuentas.map((c) => `<span class="cuenta-chip"><span class="manuscrita"></span><b>×${formatear(c.veces)}</b></span>`).join('');
+    $$('#frascoCuentas .cuenta-chip .manuscrita').forEach((el, i) => { el.textContent = F.cuentas[i].frase; });
+    $('#frasco').addEventListener('click', () => {
+      const frasco = $('#frasco');
+      frasco.classList.remove('sacudir'); void frasco.offsetWidth; frasco.classList.add('sacudir');
+      if (!mazoFrases.length) llenarFrasco();
+      const idx = mazoFrases.pop();
+      const f = F.frases[idx];
+      const estrellas = $$('#frascoEstrellas .estrellita:not(.sale)');
+      const est = estrellas[estrellas.length - 1];
+      if (est) { est.classList.add('sale'); setTimeout(() => est.remove(), 1200); }
+      const r = frasco.getBoundingClientRect();
+      Cielo.explosion(r.left + r.width / 2, r.top + r.height * 0.12, 20);
+      const card = $('#frase');
+      card.hidden = true; void card.offsetWidth;
+      $('#fraseQuien').textContent = f.quien === 'yo' ? `${F.nombreYo} te dije` : `${F.nombreVos} me dijiste`;
+      $('#fraseTexto').textContent = `«${f.texto}»`;
+      $('#fraseFecha').textContent = f.fecha;
+      card.classList.toggle('frase--yo', f.quien === 'yo');
+      card.hidden = false;
+      frasesSacadas++;
+      $('#frascoContador').textContent = `${Math.min(frasesSacadas, F.frases.length)} de ${F.frases.length} estrellas`;
+      $('#pistaFrasco').classList.remove('visible');
+      if (frasesSacadas >= 3 && resolverFrasco) { resolverFrasco(); resolverFrasco = null; }
+    });
+  }
+  alEntrar['p-frasco'] = (miCiclo) => {
+    const pantalla = $('#p-frasco');
+    const fin = frasesSacadas >= 3 ? Promise.resolve() : new Promise((r) => { resolverFrasco = r; });
+    botonAlLlegarAlFinal(pantalla, fin, miCiclo);
+  };
+
   /* ------------------------------------------------------------------
      5. EL CORAZÓN
      ------------------------------------------------------------------ */
@@ -2255,6 +3124,7 @@ const Musica = (() => {
     texto.textContent = '';
     wrap.innerHTML = ILUSTRACIONES.corazon;
     wrap.classList.remove('latiendo');
+    $('#pistaCorazon').classList.remove('visible');
     clearInterval(intervaloCorazones);
     await esperar(T(400));
     await ILUSTRACIONES.dibujar($('svg', wrap), { duracion: 3600, rapido: MOV_REDUCIDO });
@@ -2271,8 +3141,29 @@ const Musica = (() => {
       }, 1400);
     }
     await esperar(T(900));
-    if (miCiclo === ciclo) mostrarBoton($('#p-final'));
+    if (miCiclo === ciclo) {
+      mostrarBoton($('#p-final'));
+      if (toquesCorazon < 7) $('#pistaCorazon').classList.add('visible');
+    }
   };
+
+  let toquesCorazon = 0;
+  $('#corazonWrap').addEventListener('click', (e) => {
+    const wrap = e.currentTarget;
+    if (!wrap.classList.contains('latiendo')) return;
+    wrap.classList.remove('golpe'); void wrap.offsetWidth; wrap.classList.add('golpe');
+    const r = wrap.getBoundingClientRect();
+    Cielo.explosion(r.left + r.width / 2, r.top + r.height * 0.45, 22);
+    for (let i = 0; i < 4; i++) setTimeout(() => corazonFlotante(wrap), i * 120);
+    toquesCorazon++;
+    $('#pistaCorazon').classList.remove('visible');
+    if (toquesCorazon === 7) {
+      const sec = $('#secretoCorazon');
+      sec.textContent = DATOS.final.secreto || '';
+      sec.classList.add('visible');
+      Cielo.explosion(r.left + r.width / 2, r.top + r.height / 2, 60);
+    }
+  });
 
   function corazonFlotante(ref) {
     const r = ref.getBoundingClientRect();
@@ -2289,6 +3180,9 @@ const Musica = (() => {
   /* Despedida */
   const despedida = $('#despedida');
   $('#btnSalir').addEventListener('click', () => {
+    for (let i = 0; i < 7; i++) {
+      setTimeout(() => Cielo.explosion(innerWidth * (0.15 + Math.random() * 0.7), innerHeight * (0.12 + Math.random() * 0.4), 46), T(i * 260));
+    }
     despedida.hidden = false;
     requestAnimationFrame(() => despedida.classList.add('abierta'));
     $('#btnReiniciar').focus({ preventScroll: true });
@@ -2380,6 +3274,8 @@ const Cielo = (() => {
   let estrellas = [];
   const chispas = [];
   let fugaz = null;
+  let salto = 0;            // intensidad del "salto" entre capítulos (0 a 1)
+  let saltoInicio = -1;
   let proximaFugaz = performance.now() + 4000;
   const puntero = { x: 0, y: 0, tx: 0, ty: 0 };
   const colores = ['#ffffff', '#dfe9ff', '#b9d2ff', '#cfd8e8'];
@@ -2422,6 +3318,32 @@ const Cielo = (() => {
     ctx.clearRect(0, 0, W, H);
     puntero.x += (puntero.tx - puntero.x) * 0.04;
     puntero.y += (puntero.ty - puntero.y) * 0.04;
+
+    // Salto al hiperespacio: las estrellas se estiran desde el centro
+    if (saltoInicio >= 0) {
+      const p = (t - saltoInicio) / 1300;
+      salto = p >= 1 ? 0 : Math.sin(Math.PI * p);
+      if (p >= 1) saltoInicio = -1;
+    }
+    if (salto > 0.01) {
+      const cx = W / 2, cy = H / 2;
+      ctx.lineCap = 'round';
+      for (const s of estrellas) {
+        const dx = s.x - cx, dy = s.y - cy;
+        const d = Math.hypot(dx, dy) || 1;
+        const v = salto * (6 + s.z * 22) * (0.3 + d / Math.max(W, H));
+        const nx = s.x + (dx / d) * v, ny = s.y + (dy / d) * v;
+        ctx.globalAlpha = Math.min(1, 0.35 + salto) * (0.5 + s.z * 0.5);
+        ctx.strokeStyle = s.color;
+        ctx.lineWidth = s.r * s.z + 0.3;
+        ctx.beginPath(); ctx.moveTo(s.x, s.y); ctx.lineTo(nx + (dx / d) * v * 2, ny + (dy / d) * v * 2); ctx.stroke();
+        s.x = nx; s.y = ny;
+        if (s.x < -20 || s.x > W + 20 || s.y < -20 || s.y > H + 20) {
+          const a = Math.random() * Math.PI * 2, rr = Math.random() * 60;
+          s.x = cx + Math.cos(a) * rr; s.y = cy + Math.sin(a) * rr;
+        }
+      }
+    }
 
     for (const s of estrellas) {
       const brillo = RM ? 0.75 : 0.45 + 0.55 * Math.abs(Math.sin(t / 1000 * s.vel + s.fase));
@@ -2511,7 +3433,14 @@ const Cielo = (() => {
 
   medir();
   requestAnimationFrame(cuadro);
-  return { explosion };
+  function salto_() {
+    if (RM) return;
+    saltoInicio = performance.now();
+    const f = document.getElementById('destelloSalto');
+    if (f) { f.classList.remove('activo'); void f.offsetWidth; f.classList.add('activo'); }
+  }
+
+  return { explosion, salto: salto_ };
 })();
 
 </script>
